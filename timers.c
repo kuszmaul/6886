@@ -38,28 +38,61 @@ double loop(void) {
 }
 
 
+int n_trials = 5;
+
 void timeit_gettimeofday(void) {
     struct timeval start, end;
     printf("gettimeofday:\n");
-    for (int trial = 0; trial < 5; trial++) {
+    double sum_squares = 0;
+    double sum         = 0;
+    double min = 0, max = 0;
+    for (int trial = 0; trial < n_trials; trial++) {
         init();
         gettimeofday(&start, NULL);
         loop();
         gettimeofday(&end,   NULL);
-        printf(" %12.9fs\n", tdiff_timeval(&start, &end));
+        double tim = tdiff_timeval(&start, &end);
+        sum_squares += tim*tim;
+        sum         += tim;
+        if (trial==0) min = max = tim;
+        else {
+            if (tim < min) min = tim;
+            if (tim > max) max = tim;
+        }
+
+        printf(" %12.9fs\n", tim);
     }
+    double avg_x = sum/n_trials;
+    double avg_xsquared = sum_squares/n_trials;
+    printf("  mean=%12.9fs sqrt(variance)=%12.9fs relative_range=%5.2f\n",
+           avg_x, sqrt(avg_xsquared-avg_x), (max-min)/max);
 }
 
 void timeit_clock_gettime(clockid_t clk_id, const char *string) {
     struct timespec start, end;
     printf("%s\n", string);
-    for (int trial = 0; trial < 5; trial++) {
+    double sum_squares = 0;
+    double sum         = 0;
+    double min = 0, max = 0;
+    for (int trial = 0; trial < n_trials; trial++) {
         init();
         clock_gettime(clk_id, &start);
         loop();
         clock_gettime(clk_id, &end);
-        printf(" %12.9fs\n", tdiff_timespec(&start, &end));
+        double tim = tdiff_timespec(&start, &end);
+        sum_squares += tim*tim;
+        sum         += tim;
+        if (trial==0) min = max = tim;
+        else {
+            if (tim < min) min = tim;
+            if (tim > max) max = tim;
+        }
+        printf(" %12.9fs\n", tim);
     }
+    double avg_x = sum/n_trials;
+    double avg_xsquared = sum_squares/n_trials;
+    printf("  mean=%12.9fs sqrt(variance)=%12.9fs relative_range=%5.2f\n",
+           avg_x, sqrt(avg_xsquared-avg_x), (max-min)/max);
 }
 
 #define CGT(n) timeit_clock_gettime(CLOCK_ ## n, #n)
