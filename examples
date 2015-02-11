@@ -1,0 +1,5 @@
+./timers
+./lock-overhead
+taskset 1 ./lock-overhead     (note lots of variance)
+taskset 2 ./lock-overhead     (note lots of variance)
+taskset 3 ./lock-overhead     (much less variance)
