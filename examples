@@ -1,3 +1,6 @@
+make run
+./rdtsc
+./clock
 ./timers
 ./lock-overhead
 taskset 1 ./lock-overhead     (note lots of variance)

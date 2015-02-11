@@ -4,7 +4,9 @@ CXXFLAGS = $(COMPILER_FLAGS) -std=c++11
 timers: LDLIBS = -lm
 lock-overhead: COMPILER_FLAGS += -pthread 
 .PHONY: default run
-default: timers lock-overhead
+default: timers lock-overhead clock rdtsc
 run: default
+	./clock
+	./rdtsc
 	./lock-overhead
 	./timers

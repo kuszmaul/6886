@@ -1,3 +1,6 @@
 timers
 lock-overhead
 *~
+clock
+rdtsc
+
