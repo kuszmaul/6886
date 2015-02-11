@@ -1,3 +1,6 @@
+git clone https://github.com/kuszmaul/6886.git
+(or git clone git@github.mit.edu:6886-spring-2015/measurements.git)
+cat /proc/cpuinfo
 make run
 ./rdtsc
 ./clock
@@ -6,3 +9,6 @@ make run
 taskset 1 ./lock-overhead     (note lots of variance)
 taskset 2 ./lock-overhead     (note lots of variance)
 taskset 3 ./lock-overhead     (much less variance)
+look at statistics
+
+run two instances of timers 
