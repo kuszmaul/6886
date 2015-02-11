@@ -13,10 +13,7 @@ double tdiff_timespec(struct timespec *start, struct timespec *end) {
   return (end->tv_sec-start->tv_sec) + 1e-9*(end->tv_nsec-start->tv_nsec);
 }
 
-const bool fast_stats = false;
-
 class statistics {
-    std::vector<double> values;
     double min, max;
     double sum;
     double sum_squares;
@@ -25,7 +22,7 @@ class statistics {
     statistics() : min(0), max(0), sum(0), sum_squares(0), n(0) {
     }
     void measurement(double f) {
-        if (values.size()==0) {
+        if (n == 0) {
             min = max = f;
         } else {
             min = std::min(min, f);
@@ -34,43 +31,17 @@ class statistics {
         sum += f;
         sum_squares += f*f;
         n++;
-        if (!fast_stats) {
-            values.push_back(f);
-        }
     }
     double mean() {
-        if (fast_stats) {
-            return sum/n;
-        } else {
-            double sum = 0;
-            for (size_t i = 0; i < values.size(); i++) {
-                sum+=values[i];
-            }
-            return sum/values.size();
-        }
+        return sum/n;
     }
     double sigma() {
-        {
-            double Ex2 = sum_squares/n;
-            double Ex  = sum/n;
-            double result = sqrt(Ex2 - Ex*Ex);
-            printf(" E[x^2] = %f\n", Ex2);
-            printf(" E[x]^2 = %f\n", Ex*Ex);
-            printf(" fast result=%f\n", result);
-        }
-        {
-            double m = mean();
-            double sum = 0;
-            for (size_t i = 0; i < values.size(); i++) {
-                double diff = values[i]-m;
-                sum += diff*diff;
-            }
-            printf(" slow result=%f\n", sqrt(sum/n));
-            return sqrt(sum/n);
-        }
+        double Ex2 = sum_squares/n;
+        double Ex  = sum/n;
+        return sqrt(Ex2 - Ex*Ex);
     }
     void print() {
-        printf("  mean=%12.9fs sigma=%12.9fs max-min/mean=%7.4f%%\n",
+        printf("  mean=%12.9fs sigma=%12.9fs (max-min)/mean=%7.4f%%\n",
                mean(), sigma(), 100*(max-min)/mean());
     }
 };
@@ -137,12 +108,6 @@ void timeit_clock_gettime(clockid_t clk_id, const char *string) {
 #define CGT(n) timeit_clock_gettime(CLOCK_ ## n, #n)
 
 int main(int argc __attribute__((unused)), const char *argv[] __attribute__((unused))) {
-    {
-        statistics c;
-        c.measurement(1);
-        c.measurement(2);
-        c.print();
-    }
 
     timeit_gettimeofday();
     CGT(REALTIME);
